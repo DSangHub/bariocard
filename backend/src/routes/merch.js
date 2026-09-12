@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 router.post('/discount', (req,res)=>{
   const {memberId} = req.body;
   // Verify member exists
-  res.json({code:`TBIO20-${memberId.slice(-4)}`, percentOff:20, validFor:'merch only, retailer-funded, ABC compliant'});
+  res.json({code:`BARIO20-${memberId.slice(-4)}`, percentOff:20, validFor:'merch only, retailer-funded, ABC compliant'});
 });
 
 router.post('/checkout', async (req,res)=>{
@@ -25,7 +25,7 @@ router.post('/checkout', async (req,res)=>{
     res.json({url: session.url, id: session.id});
   }catch(e){
     // Fallback mock if no Stripe key
-    res.json({url:'https://checkout.stripe.com/mock_TBIO', mock:true, error:e.message});
+    res.json({url:'https://checkout.stripe.com/mock_BARIO', mock:true, error:e.message});
   }
 });
 
