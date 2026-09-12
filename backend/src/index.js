@@ -18,4 +18,10 @@ app.use('/api/v1/partners/rideshare', rideshareRouter);
 app.use('/api/v1/partners/wagering', wageringRouter);
 app.use('/api/v1/merch', merchRouter);
 
+app.use((error, req, res, next) => {
+  console.error(error);
+  if (res.headersSent) return next(error);
+  res.status(500).json({error:'Internal server error'});
+});
+
 app.listen(process.env.PORT || 3001, ()=> console.log('BARIO API running'));
