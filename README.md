@@ -1,5 +1,5 @@
 
-# The Bar Is Open - TBIO
+# The Bar Is Open - BARIO
 Voluntary 21+ Membership with Ride-Share Safety + Wagering Partners + Merch
 
 ## California ABC Compliant
