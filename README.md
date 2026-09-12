@@ -1,6 +1,6 @@
 
-# The Bar Is Open - BARIO
-Voluntary 21+ Membership with Ride-Share Safety + Wagering Partners + Merch
+# BARIO
+BARIO is a voluntary 21+ membership program with ride-share safety, wagering partners, and merchandise benefits.
 
 ## California ABC Compliant
 - Voluntary membership, NOT required to purchase alcohol (Type 48 compliant)
