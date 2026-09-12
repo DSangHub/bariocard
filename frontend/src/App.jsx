@@ -18,7 +18,7 @@ export default function App(){
       <header style={{textAlign:'center',maxWidth:760,margin:'0 auto 24px'}}>
         <img
           src="/bario-logo.png"
-          alt="The Bar Is Open"
+          alt="BARIO gold bell and cocktail logo"
           style={{display:'block',width:'min(100%, 420px)',height:'auto',margin:'0 auto'}}
         />
         <h1 style={{color:'#f5b316',marginTop:12}}>BARIO Voluntary 21+ Membership</h1>
