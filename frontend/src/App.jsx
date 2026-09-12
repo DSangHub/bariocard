@@ -3,14 +3,17 @@ import {useState} from 'react';
 export default function App(){
   const [memberId,setMemberId]=useState(localStorage.getItem('bario_id')||'');
   const [points,setPoints]=useState(250);
+  const [delivery,setDelivery]=useState('pickup');
   const join = async (e)=>{
     e.preventDefault();
     const fd = new FormData(e.target);
     const dob = fd.get('dob');
     const age = (Date.now()-new Date(dob).getTime())/(365.25*24*3600*1000);
     if(age<21){alert('Must be 21+');return;}
-    const res = await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/members/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dob,name:fd.get('name'),email:fd.get('email')})});
+    const mailingAddress = delivery === 'mail' ? {street:fd.get('street'),city:fd.get('city'),state:fd.get('state'),postalCode:fd.get('postalCode')} : null;
+    const res = await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/members/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dob,name:fd.get('name'),email:fd.get('email'),phone:fd.get('phone'),preferredDelivery:delivery,mailingAddress})});
     const data = await res.json();
+    if(!res.ok){alert(data.error||'Unable to create membership');return;}
     if(data.memberId){localStorage.setItem('bario_id',data.memberId); setMemberId(data.memberId);}
   };
   return (
@@ -28,7 +31,20 @@ export default function App(){
         <form onSubmit={join} style={{display:'grid',gap:8,maxWidth:400}}>
           <input name="name" placeholder="Name" required style={{padding:8}}/>
           <input name="email" type="email" placeholder="Email" required style={{padding:8}}/>
+          <input name="phone" type="tel" placeholder="Phone (optional)" style={{padding:8}}/>
           <input name="dob" type="date" required style={{padding:8}}/>
+          <label>Physical card delivery
+            <select value={delivery} onChange={e=>setDelivery(e.target.value)} style={{display:'block',padding:8,marginTop:4}}>
+              <option value="pickup">Pick up at a participating bar</option>
+              <option value="mail">Mail from BARIO</option>
+            </select>
+          </label>
+          {delivery === 'mail' && <div style={{display:'grid',gap:8}}>
+            <input name="street" placeholder="Street address" required style={{padding:8}}/>
+            <input name="city" placeholder="City" required style={{padding:8}}/>
+            <input name="state" placeholder="State" required maxLength="2" style={{padding:8}}/>
+            <input name="postalCode" placeholder="ZIP code" required style={{padding:8}}/>
+          </div>}
           <label><input type="checkbox" required/> I am 21+ and understand membership is voluntary, not required to purchase alcohol. CCPA Notice acknowledged.</label>
           <button style={{background:'#f5b316',color:'#000',padding:10}}>Join Free - Get BARIO ID</button>
         </form>

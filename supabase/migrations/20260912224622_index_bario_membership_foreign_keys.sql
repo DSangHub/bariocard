@@ -1,0 +1,12 @@
+create index age_verifications_member_idx on public.age_verifications(member_id);
+create index age_verifications_bar_idx on public.age_verifications(partner_bar_id);
+create index age_verifications_verifier_idx on public.age_verifications(verified_by_user_id);
+create index audit_log_actor_idx on public.audit_log(actor_user_id);
+create index bar_staff_user_idx on public.bar_staff(auth_user_id);
+create index card_scans_card_idx on public.card_scans(card_id);
+create index card_scans_bar_idx on public.card_scans(partner_bar_id);
+create index cards_bar_idx on public.cards(issuing_bar_id);
+create index cards_member_idx on public.cards(member_id);
+create index fulfillment_card_idx on public.fulfillment_orders(card_id);
+create index fulfillment_member_idx on public.fulfillment_orders(member_id);
+create index fulfillment_bar_idx on public.fulfillment_orders(partner_bar_id);
