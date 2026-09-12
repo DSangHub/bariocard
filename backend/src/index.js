@@ -18,4 +18,4 @@ app.use('/api/v1/partners/rideshare', rideshareRouter);
 app.use('/api/v1/partners/wagering', wageringRouter);
 app.use('/api/v1/merch', merchRouter);
 
-app.listen(process.env.PORT || 3001, ()=> console.log('TBIO API running'));
+app.listen(process.env.PORT || 3001, ()=> console.log('BARIO API running'));
