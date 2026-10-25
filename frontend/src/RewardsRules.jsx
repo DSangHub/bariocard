@@ -1,4 +1,7 @@
 const rules = [
+  ['Bar membership', 'First 30 days at no charge, then $75 per month at launch pricing.', 'Participate in the initial three-month program', 'Launch offer'],
+  ['Participating Bars listing', 'Publish ride-home discounts only after a genuine offer and its terms are confirmed.', 'Bar profile and approved ride-home offer', 'Offer verification required'],
+  ['Merchandise sales', 'Offer participating bars the option to sell merchandise after the initial three-month program.', 'Whether to participate; product and sales terms agreed separately', 'After three months'],
   ['Bar registration', 'Verified business profile and authorized owner or manager required.', 'Business profile, location, and contact details', 'Planned'],
   ['Member eligibility', 'Approved, age-verified BARIO membership required.', 'Additional lawful participation terms', 'Required'],
   ['Visit points', 'Verify each visit; prevent duplicate points for the same visit.', 'Points per visit and daily cap', 'Planned'],
@@ -17,6 +20,19 @@ const rules = [
 
 export default function RewardsRules() {
   return <section className="rewards" aria-labelledby="rewards-heading">
+    <div className="rewards-license" aria-labelledby="bar-membership-heading">
+      <h2 id="bar-membership-heading">Bring in new customers. Give them a reason to return.</h2>
+      <p>BARIO connects customers with participating bars and helps bars build repeat business.</p>
+      <p style={{fontSize:'1.5rem',fontWeight:700,color:'#ffe1a1'}}>First 30 days: no charge. Then $75/month.</p>
+      <ol>
+        <li><strong>Days 1–30:</strong> Try BARIO membership at no charge.</li>
+        <li><strong>After day 30:</strong> Continue at the launch membership price of $75 per month during the initial three-month program and afterward.</li>
+        <li><strong>Participating Bars:</strong> Get listed among bars offering discounts on rides home once your ride offer is confirmed.</li>
+        <li><strong>After three months:</strong> Get the option to sell merchandise. Products, pricing, and sales terms will be offered separately.</li>
+      </ol>
+      <p>Ride discounts depend on a confirmed offer, provider eligibility, availability, and published restrictions. The membership fee does not itself include ride credit. No Uber or Lyft partnership is currently confirmed.</p>
+      <p>Bar enrollment and membership billing are coming soon.</p>
+    </div>
     <p className="rewards-eyebrow">FOR PARTICIPATING BARS</p>
     <h2 id="rewards-heading">Choose Your Rewards System</h2>
     <p>Your Bar. Your Points. Your Rewards. Choose how customers earn points through verified visits, time spent, food purchases, and repeat visits.</p>
