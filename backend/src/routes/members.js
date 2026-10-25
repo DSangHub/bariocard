@@ -33,54 +33,24 @@ router.post('/verify', async (req,res,next)=>{
     if (preferredDelivery === 'mail' && !mailingAddress?.street) return res.status(400).json({error:'A mailing address is required for mail delivery'});
     if (!isAtLeast21(dob)) return res.status(403).json({error:'21+ only'});
 
-    const number = memberNumber();
-    const { data: member, error: memberError } = await supabase.from('members').insert({
-      member_number: number,
-      full_name: name.trim(),
-      email: email.trim().toLowerCase(),
-      phone,
-      date_of_birth: dob,
-      status: 'age_pending',
-      preferred_delivery: preferredDelivery,
-      mailing_address: preferredDelivery === 'mail' ? mailingAddress : null,
-    }).select('id, member_number, status').single();
-    if (memberError) {
-      if (memberError.code === '23505') return res.status(409).json({error:'A member with this email already exists'});
-      throw memberError;
-    }
-
-    const verificationMethod = preferredDelivery === 'pickup' ? 'bar_in_person' : 'bario_remote';
-    const { error: relatedError } = await supabase.from('age_verifications').insert({
-      member_id: member.id,
-      method: verificationMethod,
-      result: 'pending',
-    });
-    if (relatedError) throw relatedError;
-
     const card = cardCredentials();
-    const { data: digitalCard, error: cardError } = await supabase.from('cards').insert({
-      member_id: member.id,
-      card_number: card.cardNumber,
-      qr_token_hash: card.tokenHash,
-      card_type: 'digital',
-      status: 'issued',
-      issued_by: 'bario',
-    }).select('card_number, status').single();
-    if (cardError) throw cardError;
-
-    const { error: fulfillmentError } = await supabase.from('fulfillment_orders').insert({
-      member_id: member.id,
-      delivery_method: preferredDelivery,
-      shipping_address: preferredDelivery === 'mail' ? mailingAddress : null,
-      status: 'pending',
+    const { data: member, error } = await supabase.rpc('register_bario_member', {
+      payload: {member_number: memberNumber(), full_name: name.trim(), email: email.trim().toLowerCase(),
+        phone, date_of_birth: dob, preferred_delivery: preferredDelivery,
+        mailing_address: preferredDelivery === 'mail' ? mailingAddress : null,
+        card_number: card.cardNumber, qr_token_hash: card.tokenHash}
     });
-    if (fulfillmentError) throw fulfillmentError;
+    if (error) {
+      if (error.code === '23505') return res.status(409).json({error:'A member with this email already exists'});
+      throw error;
+    }
 
     res.status(201).json({
       memberId: member.member_number,
       status: member.status,
       verified: false,
-      digitalCard: digitalCard.card_number,
+      digitalCard: card.cardNumber,
+      points: member.points,
       qrToken: card.token,
       delivery: preferredDelivery,
       nextStep: preferredDelivery === 'pickup' ? 'Present government ID at a participating bar.' : 'Complete BARIO remote age verification.',

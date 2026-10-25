@@ -1,8 +1,17 @@
 
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 export default function App(){
   const [memberId,setMemberId]=useState(localStorage.getItem('bario_id')||'');
-  const [points,setPoints]=useState(250);
+  const [points,setPoints]=useState(null);
+  useEffect(() => {
+    if (!memberId) return;
+    let cancelled = false;
+    fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/members/'+encodeURIComponent(memberId))
+      .then(r => { if (!r.ok) throw new Error('Profile unavailable'); return r.json(); })
+      .then(d => { if (!cancelled) setPoints(d.points); })
+      .catch(() => { if (!cancelled) setPoints(null); });
+    return () => { cancelled = true; };
+  }, [memberId]);
   const [delivery,setDelivery]=useState('pickup');
   const join = async (e)=>{
     e.preventDefault();
@@ -14,7 +23,7 @@ export default function App(){
     const res = await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/members/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dob,name:fd.get('name'),email:fd.get('email'),phone:fd.get('phone'),preferredDelivery:delivery,mailingAddress})});
     const data = await res.json();
     if(!res.ok){alert(data.error||'Unable to create membership');return;}
-    if(data.memberId){localStorage.setItem('bario_id',data.memberId); setMemberId(data.memberId);}
+    if(data.memberId){setPoints(data.points); localStorage.setItem('bario_token',data.qrToken); localStorage.setItem('bario_id',data.memberId); setMemberId(data.memberId);}
   };
   return (
     <div style={{background:'#0f0f0f',color:'#fff',minHeight:'100vh',padding:20,fontFamily:'sans-serif'}}>
@@ -50,12 +59,12 @@ export default function App(){
         </form>
       ):(
         <div>
-          <p>Member: {memberId} | Points: {points}</p>
+          <p>Member: {memberId} | Points: {points ?? 'Unavailable'}</p>
           <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
-            <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/partners/rideshare/lyft/discount',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get Lyft $5 Off</button>
-            <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/partners/rideshare/uber/voucher',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get Uber Voucher</button>
+            <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/partners/rideshare/lyft/discount',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(localStorage.getItem('bario_token')||'')},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get Lyft $5 Off</button>
+            <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/partners/rideshare/uber/voucher',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(localStorage.getItem('bario_token')||'')},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get Uber Voucher</button>
             <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/partners/wagering/draftkings/promo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({memberId,state:'CA'})}); alert(JSON.stringify(await r.json()))}}>Get DraftKings Promo (CA safe)</button>
-            <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/merch/discount',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get 20% Merch Code</button>
+            <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/merch/discount',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(localStorage.getItem('bario_token')||'')},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get 20% Merch Code</button>
             <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/merch/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({memberId,email:'test@bario.com',items:[{name:'BARIO Tee',price:35}]})}); const d=await r.json(); window.open(d.url,'_blank')}}>Buy Tee via Stripe</button>
           </div>
         </div>
