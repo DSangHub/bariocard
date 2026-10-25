@@ -1,34 +1,12 @@
-
 import express from 'express';
 const router = express.Router();
 
-function isWageringLegal(state){
-  // CA, TX, UT, etc not legal for real-money online sports
-  const illegal = ['CA','TX','UT','ID'];
-  return !illegal.includes((state||'CA').toUpperCase());
-}
-
-router.post('/draftkings/promo', async (req,res)=>{
-  const {memberId, state='CA'} = req.body;
-  if(!isWageringLegal(state)){
-    return res.json({
-      provider:'draftkings',
-      type:'free_to_play',
-      promo:'DK-BARIO-FREE10',
-      disclaimer:'CA: Real-money sports wagering not legal. Free-to-play contest only. 21+ Gamble Responsibly 1-800-GAMBLER',
-      affiliate_tracking: process.env.DRAFTKINGS_AFFILIATE_KEY
-    });
-  }
-  // Real call when legal: await fetch('https://api.draftkings.com/partner/v1/promos', {...})
-  res.json({provider:'draftkings', type:'real_money', promo:`DK-BARIO-${memberId.slice(-4)}`, amount:'$10 off first contest'});
-});
-
-router.post('/fanduel/promo', async (req,res)=>{
-  const {memberId, state='CA'} = req.body;
-  if(!isWageringLegal(state)){
-    return res.json({provider:'fanduel', type:'free_to_play', promo:'FD-BARIO-FREE10', disclaimer:'CA: Free-to-play only'});
-  }
-  res.json({provider:'fanduel', type:'real_money', promo:`FD-BARIO-${memberId.slice(-4)}`});
+// No promotions or points until licensing and provider approval are implemented.
+router.post(['/draftkings/promo', '/fanduel/promo'], (req, res) => {
+  res.status(503).json({
+    error: 'Gaming rewards are not available. License submission, review, and approval are required before future activation.',
+    enabled: false,
+  });
 });
 
 export default router;

@@ -9,3 +9,16 @@ body { margin: 0; }
 button, input { font: inherit; }
 button { cursor: pointer; padding: 0.65rem 0.9rem; }
 input { color: #111; }
+
+.rewards { max-width: 1100px; margin: 3rem auto; padding: clamp(16px, 3vw, 32px); background: #191919; border: 1px solid #59451e; border-radius: 16px; line-height: 1.6; }
+.rewards h2 { color: #f5b316; font-size: clamp(1.5rem, 4vw, 2rem); margin: 0; }
+.rewards-eyebrow { color: #e4be70; font-size: .8rem; letter-spacing: .08em; }
+.rewards-scroll { overflow-x: auto; margin-top: 24px; }
+.rewards-table { width: 100%; min-width: 680px; border-collapse: collapse; text-align: left; font-size: .95rem; }
+.rewards-table caption { text-align: left; font-weight: bold; padding-bottom: 12px; }
+.rewards-table th, .rewards-table td { padding: 14px; border-bottom: 1px solid #444; vertical-align: top; }
+.rewards-table thead { background: #302710; color: #ffe1a1; }
+.rewards-table tbody th { min-width: 140px; }
+.rewards-license { margin-top: 24px; padding: 20px; background: #262115; border-radius: 10px; }
+.rewards-license h3 { margin-top: 0; color: #ffe1a1; }
+button:disabled { cursor: not-allowed; opacity: .65; }

@@ -1,3 +1,4 @@
+import RewardsRules from './RewardsRules.jsx';
 
 import {useEffect,useState} from 'react';
 export default function App(){
@@ -35,7 +36,7 @@ export default function App(){
         />
         <h1 style={{color:'#f5b316',marginTop:12}}>BARIO Voluntary 21+ Membership</h1>
       </header>
-      <p>Voluntary. Not required to drink. BPC 25600 Compliant - No free alcohol rewards.</p>
+      <p>Voluntary membership. No alcohol purchase required. Alcohol and gaming points are disabled.</p>
       {!memberId ? (
         <form onSubmit={join} style={{display:'grid',gap:8,maxWidth:400}}>
           <input name="name" placeholder="Name" required style={{padding:8}}/>
@@ -63,14 +64,15 @@ export default function App(){
           <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
             <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/partners/rideshare/lyft/discount',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(localStorage.getItem('bario_token')||'')},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get Lyft $5 Off</button>
             <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/partners/rideshare/uber/voucher',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(localStorage.getItem('bario_token')||'')},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get Uber Voucher</button>
-            <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/partners/wagering/draftkings/promo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({memberId,state:'CA'})}); alert(JSON.stringify(await r.json()))}}>Get DraftKings Promo (CA safe)</button>
+            <button disabled title="Gaming rewards require license review and are not available yet">Gaming rewards — coming later</button>
             <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/merch/discount',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(localStorage.getItem('bario_token')||'')},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get 20% Merch Code</button>
             <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/merch/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({memberId,email:'test@bario.com',items:[{name:'BARIO Tee',price:35}]})}); const d=await r.json(); window.open(d.url,'_blank')}}>Buy Tee via Stripe</button>
           </div>
         </div>
       )}
+      <RewardsRules />
       <hr style={{margin:'20px 0'}}/>
-      <p style={{fontSize:12,opacity:0.6}}>BPC 25600: No free alcohol. Discounts retailer-funded. Voluntary program. 21+ Drink responsibly. Ride-share encouraged. Wagering geo-fenced, free-to-play in CA. Gamble responsibly 1-800-GAMBLER.</p>
+      <p style={{fontSize:12,opacity:0.6}}>Voluntary program. 21+ Drink responsibly. Alcohol and gaming rewards are unavailable pending future license review and approval.</p>
     </div>
   )
 }
