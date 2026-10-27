@@ -22,3 +22,11 @@ input { color: #111; }
 .rewards-license { margin-top: 24px; padding: 20px; background: #262115; border-radius: 10px; }
 .rewards-license h3 { margin-top: 0; color: #ffe1a1; }
 button:disabled { cursor: not-allowed; opacity: .65; }
+.ride-form { display: grid; gap: 16px; max-width: 650px; }
+.ride-form label { display: block; }
+.ride-form input:not([type=radio]) { display: block; width: 100%; padding: 12px; margin-top: 6px; background: #fff; border: 1px solid #888; border-radius: 6px; }
+.ride-form fieldset { display: flex; flex-wrap: wrap; gap: 16px; border: 1px solid #666; }
+.ride-form input[type=radio] { accent-color: #f5b316; }
+.ride-form button { background: #f5b316; color: #111; border: 0; border-radius: 6px; }
+.ride-options { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,260px),1fr)); gap: 16px; }
+.ride-options a { color: #ffe1a1; }

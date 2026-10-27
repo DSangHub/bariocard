@@ -1,4 +1,5 @@
 import express from 'express';
+import { createRidePlan } from '../lib/ride-compare.js';
 import { createHash } from 'node:crypto';
 import { supabase } from '../lib/supabase.js';
 const router = express.Router();
@@ -32,6 +33,12 @@ router.use(async (req, res, next) => {
       return res.status(403).json({error:'Age verification required'});
     next();
   } catch (error) { next(error); }
+});
+
+router.post('/compare', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try { res.json(createRidePlan(req.body)); }
+  catch (error) { res.status(400).json({error:error.message}); }
 });
 
 // Fail closed until a provider-backed offer integration is configured.

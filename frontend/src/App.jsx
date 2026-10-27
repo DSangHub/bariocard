@@ -1,3 +1,4 @@
+import RideCompare from './RideCompare.jsx';
 import RewardsRules from './RewardsRules.jsx';
 
 import {useEffect,useState} from 'react';
@@ -62,14 +63,13 @@ export default function App(){
         <div>
           <p>Member: {memberId} | Points: {points ?? 'Unavailable'}</p>
           <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
-            <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/partners/rideshare/lyft/discount',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(localStorage.getItem('bario_token')||'')},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get Lyft $5 Off</button>
-            <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/partners/rideshare/uber/voucher',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(localStorage.getItem('bario_token')||'')},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get Uber Voucher</button>
             <button disabled title="Gaming rewards require license review and are not available yet">Gaming rewards — coming later</button>
             <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/merch/discount',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(localStorage.getItem('bario_token')||'')},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get 20% Merch Code</button>
             <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/merch/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({memberId,email:'test@bario.com',items:[{name:'BARIO Tee',price:35}]})}); const d=await r.json(); window.open(d.url,'_blank')}}>Buy Tee via Stripe</button>
           </div>
         </div>
       )}
+      <RideCompare memberId={memberId} />
       <RewardsRules />
       <hr style={{margin:'20px 0'}}/>
       <p style={{fontSize:12,opacity:0.6}}>Voluntary program. 21+ Drink responsibly. Alcohol and gaming rewards are unavailable pending future license review and approval.</p>

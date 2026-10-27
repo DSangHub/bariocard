@@ -44,3 +44,10 @@ POST /api/v1/merch/discount
 Frontend: Vercel -> import /frontend
 Backend: Render / Railway / Fly.io
 Set env vars in dashboard.
+
+## Ride Compare
+The member-facing planner accepts a pickup address, destination, and departure in 25, 30, 45, or 60 minutes. `POST /api/v1/partners/rideshare/compare` requires the member ID and issued card credential in the Bearer authorization header, plus approved 21+ membership and a passed age check.
+
+The current response returns provider availability and outbound links. Live fares, ETAs, bidding, booking, notifications, and redemption are not activated. No credentials or approved quote integrations are present in this repository; provider approval is required before adding live adapters. The client keeps its countdown in page memory only and sends no addresses in outbound links. The proposed benefit is 50 cents per eligible road mile up to 10 miles ($5), and is explicitly inactive. User-entered distance is never used to award discounts.
+
+Validation: `node --test backend/test/*.test.js`; `npm run build --prefix frontend`.
