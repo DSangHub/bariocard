@@ -55,3 +55,7 @@ summary { cursor: pointer; font-weight: 600; }
 footer { padding: 24px 0; font-size: .85rem; color: #bbb; }
 :focus-visible { outline: 3px solid #f5b316; outline-offset: 3px; }
 @media(max-width:640px) { .digital-card { grid-template-columns: 1fr; } }
+.language-toggle { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.language-toggle button { width: auto; margin: 0; padding: 9px 16px; border: 1px solid #b69755; border-radius: 8px; background: #191919; color: #ffe1a1; cursor: pointer; }
+.language-toggle button[aria-pressed="true"] { background: #f5b316; color: #111; border-color: #f5b316; font-weight: 700; }
+.language-toggle button:hover { border-color: #ffe1a1; }
