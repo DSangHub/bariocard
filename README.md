@@ -1,53 +1,42 @@
+# BARIO — Free Digital Membership
 
-# BARIO
-BARIO is a voluntary 21+ membership program with ride-share safety, wagering partners, and merchandise benefits.
+Customers join free at launch. No card, subscription, automatic upgrade, or payment collection is part of customer enrollment. Bars have a separate proposed 30-day-free / $75 monthly plan; bar billing is not enabled here.
 
-## California ABC Compliant
-- Voluntary membership, NOT required to purchase alcohol (Type 48 compliant)
-- No free alcoholic beverages as rewards per BPC 25600 / Rule 106
-- Retailer-funded discounts only, no supplier funding (no tied-house)
-- 21+ verified, CCPA Notice of Financial Incentive included
-- Ride-share encouraged, wagering geo-fenced (CA = free-to-play only)
+## Customer flow
 
-## Structure
-/frontend - React + Vite + Tailwind (deploy to Vercel/Netlify)
-/backend - Express API with Stripe, Lyft, Uber, DraftKings connectors
+Create an email/password account, confirm email, sign in, then complete name/date of birth and optional phone. Enrollment creates a free membership, digital card, pending age check, and welcome activity in one transaction. Existing memberships can be linked only to a confirmed account with the matching email. Membership status and points come from the server. The signup form includes password visibility, confirmation resend, password reset and recovery, and sign-out.
 
-## Quick Start
-1. `cd backend && cp .env.example .env` fill keys
-2. `npm install && npm run dev` -> http://localhost:3001
-3. `cd ../frontend && npm install && npm run dev` -> http://localhost:5173
+A digital card creates a 90-second, single-use QR. Refresh invalidates the previous QR. Codes contain no name, email, date of birth, or payment details. Membership is not proof of age. Staff at approved bars can scan with camera where supported or paste the temporary code. Staff must explicitly confirm an in-person government ID check before changing pending age approval. The backend checks staff assignment, bar approval, membership/card status and age. One visit per bar per UTC day is recorded, with no automatic reward points or ride discount. Activity history is visible only to its owner.
 
-## Env Vars Required
-SUPABASE_URL=https://your-project-ref.supabase.co
-SUPABASE_SECRET_KEY=sb_secret_... # backend only; never expose in VITE_* variables
-STRIPE_SECRET_KEY=sk_test_...
-LYFT_CLIENT_ID=...
-LYFT_CLIENT_SECRET=...
-UBER_CLIENT_ID=...
-UBER_CLIENT_SECRET=...
-DRAFTKINGS_AFFILIATE_KEY=...
-FANDUEL_AFFILIATE_KEY=...
-JWT_SECRET=...
+Phone wallet passes, reward redemption, self-service bar onboarding, billing and license uploads remain future work.
 
-## API Endpoints
-GET /api/v1/members/:id
-POST /api/v1/members/verify (21+)
-POST /api/v1/partners/rideshare/lyft/discount
-POST /api/v1/partners/rideshare/uber/voucher
-POST /api/v1/partners/wagering/draftkings/promo (geo-fenced)
-POST /api/v1/partners/wagering/fanduel/promo
-POST /api/v1/merch/checkout (Stripe)
-POST /api/v1/merch/discount
+## Hosting
 
-## Deploy
-Frontend: Vercel -> import /frontend
-Backend: Render / Railway / Fly.io
-Set env vars in dashboard.
+The production membership API is the `bario-membership` Supabase Edge Function in the existing BARIO project. The frontend defaults to this endpoint; its project URL and publishable key are public configuration. No server secrets are placed in Vite variables.
+
+Frontend: set project root to `frontend`, run `npm ci` and `npm run build`, publish `dist`. Keep Supabase Auth Site URL and allowed redirect URLs set to the actual HTTPS frontend origin (including https://bariocard.com/ and https://www.bariocard.com/ if used). Confirmation and password recovery email delivery require working Supabase mail configuration. No production frontend hosting project was identified during this change.
+
+Local frontend: `npm ci --prefix frontend` then `npm run dev --prefix frontend`. It uses the deployed Edge Function by default. Add localhost to Auth redirects for local confirmation/recovery tests.
+
+Optional Express backend: `npm ci --prefix backend`, set `SUPABASE_URL`, `SUPABASE_SECRET_KEY` and `FRONTEND_URL` in `backend/.env`, then `npm start --prefix backend` from an environment that loads those variables. Set `VITE_API_URL=http://localhost:3001` for this mode. Express and Edge share membership business logic in `supabase/functions/_shared`. Do not expose the service-role/secret key to customers.
+
+## API
+
+All membership/staff/rideshare endpoints require a confirmed Supabase Auth session in the Bearer header. Static legacy card credentials no longer authenticate accounts. Private responses have Cache-Control: no-store.
+
+- POST /api/v1/members/enroll
+- GET /api/v1/members/me
+- POST /api/v1/members/me/card
+- GET /api/v1/staff/bars
+- POST /api/v1/staff/scan
+- POST /api/v1/partners/rideshare/compare
+
+Apply migrations in order. Function execution and private tables are service-only, with RLS enabled and no customer direct grants. The Edge Function validates Auth.getUser on every request; gateway JWT validation is disabled because authentication is implemented in the handler. Authorization uses database ownership and staff assignments, never editable user metadata.
 
 ## Ride Compare
-The member-facing planner accepts a pickup address, destination, and departure in 25, 30, 45, or 60 minutes. `POST /api/v1/partners/rideshare/compare` requires the member ID and issued card credential in the Bearer authorization header, plus approved 21+ membership and a passed age check.
 
-The current response returns provider availability and outbound links. Live fares, ETAs, bidding, booking, notifications, and redemption are not activated. No credentials or approved quote integrations are present in this repository; provider approval is required before adding live adapters. The client keeps its countdown in page memory only and sends no addresses in outbound links. The proposed benefit is 50 cents per eligible road mile up to 10 miles ($5), and is explicitly inactive. User-entered distance is never used to award discounts.
+Plan departure in 25/30/45/60 minutes, with pickup/destination and an in-page countdown. Live Uber/Lyft quotes, bids, booking, notifications, and discounts are not connected. Provider handoff links do not send addresses. The proposed 50 cents per eligible road mile up to 10 miles ($5) remains explicitly inactive. Customer membership itself is free.
 
-Validation: `node --test backend/test/*.test.js`; `npm run build --prefix frontend`.
+## Validation
+
+`node --test backend/test/*.test.js` and `npm run build --prefix frontend`. Database transaction checks cover enrollment idempotency, age/staff checks, QR expiry/replay, and duplicate visits. Live API verification covers password sign-in, free enrollment, profile/activity, decodable QR, pending-age rejection, and absence of staff access. Temporary test records are deleted after verification.

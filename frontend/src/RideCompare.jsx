@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
+import {apiFetch} from './membership-api.js';
 
 export default function RideCompare({memberId}) {
   const [minutes,setMinutes]=useState(25);
@@ -20,16 +21,12 @@ export default function RideCompare({memberId}) {
     const fields=new FormData(event.currentTarget);
     controller.current?.abort(); controller.current=new AbortController();
     try {
-      const token=localStorage.getItem('bario_token');
-      if (!memberId || !token) throw new Error('Join BARIO and complete age approval before using Ride Compare. Existing members without a credential need membership support.');
-      const response=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/partners/rideshare/compare',{
+      if (!memberId) throw new Error('Complete your free BARIO membership above.');
+      const data=await apiFetch('partners/rideshare/compare',{
         method:'POST',signal:controller.current.signal,
-        headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
         body:JSON.stringify({memberId,pickup:fields.get('pickup'),destination:fields.get('destination'),
           departureAt:new Date(Date.now()+minutes*60000).toISOString()})
       });
-      const data=await response.json();
-      if (!response.ok) throw new Error(data.error||'Unable to check ride options.');
       setNow(Date.now()); setResult(data);
     } catch (e) { if(e.name!=='AbortError') setError(e.message); }
     finally { setBusy(false); }
@@ -59,7 +56,7 @@ export default function RideCompare({memberId}) {
         <a href={provider.bookingUrl} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">Check in {provider.name}</a>
         <p>Enter your pickup and destination there. No booking has been made.</p>
       </article>)}</div>
-      <p>{result.discount.message} Membership pricing and redemption limits are not finalized.</p>
+      <p>{result.discount.message} Customer membership is free to start. Ride redemption limits are not finalized.</p>
       <button onClick={()=>setResult(null)}>Change trip</button>
     </div>}
   </section>;

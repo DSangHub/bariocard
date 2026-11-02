@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
+import staffRouter from './routes/staff.js';
 import membersRouter from './routes/members.js';
 import rideshareRouter from './routes/rideshare.js';
 import wageringRouter from './routes/wagering.js';
@@ -12,14 +13,15 @@ const app = express();
 app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(express.json());
 
-app.get('/health', (req,res)=> res.json({ok:true, abc_compliant:true}));
+app.get('/health', (req,res)=> res.json({ok:true}));
+app.use('/api/v1/staff', staffRouter);
 app.use('/api/v1/members', membersRouter);
 app.use('/api/v1/partners/rideshare', rideshareRouter);
 app.use('/api/v1/partners/wagering', wageringRouter);
 app.use('/api/v1/merch', merchRouter);
 
 app.use((error, req, res, next) => {
-  console.error(error);
+  console.error('Request failed', {code:error.code || 'internal'});
   if (res.headersSent) return next(error);
   res.status(500).json({error:'Internal server error'});
 });

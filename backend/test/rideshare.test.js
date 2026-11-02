@@ -5,19 +5,21 @@ process.env.SUPABASE_SECRET_KEY='test-only';
 const {default:express}=await import('express');
 const {supabase}=await import('../src/lib/supabase.js');
 const {default:router}=await import('../src/routes/rideshare.js');
-const app=express(); app.use(express.json()); app.use(router);
+const app=express(); app.use(express.json()); app.use('/api/v1/partners/rideshare',router);
 const server=app.listen(0,'127.0.0.1');
 await new Promise(resolve=>server.once('listening',resolve));
-const url=`http://127.0.0.1:${server.address().port}`;
+const url=`http://127.0.0.1:${server.address().port}/api/v1/partners/rideshare`;
 let member,card,verification;
+supabase.auth.getUser=async token=>({data:{user:token==='valid-session'?{id:'customer',email:'customer@example.invalid',email_confirmed_at:new Date().toISOString()}:null},error:token==='valid-session'?null:new Error('Invalid session')});
 supabase.from=(table)=>{const q={select:()=>q,eq:()=>q,order:()=>q,limit:()=>q,maybeSingle:async()=>({data:{members:member,cards:card,age_verifications:verification}[table]})};return q;};
 test('rideshare authorization and fail-closed offers',async()=>{
  try {
   for(const path of ['/lyft/discount','/uber/voucher','/compare']) {
-   const request=(token)=>fetch(url+path,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+'a'.repeat(43)}:{})},body:JSON.stringify({memberId:'BARIO-TEST',pickup:'123 Bar Street, Fresno CA',destination:'456 Home Street, Fresno CA',departureAt:new Date(Date.now()+25*60000).toISOString()})});
+   const request=(token)=>fetch(url+path,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+'valid-session'}:{})},body:JSON.stringify({memberId:'BARIO-TEST',pickup:'123 Bar Street, Fresno CA',destination:'456 Home Street, Fresno CA',departureAt:new Date(Date.now()+25*60000).toISOString()})});
    assert.equal((await request(false)).status,401);
+   assert.equal((await fetch(url+path,{method:'POST',headers:{Authorization:'Bearer old-card-token','Content-Type':'application/json'},body:'{}'})).status,401);
    member=null; assert.equal((await request(true)).status,403);
-   member={id:'id',status:'age_pending',date_of_birth:'1990-01-01'};
+   member={id:'id',member_number:'BARIO-TEST',status:'age_pending',date_of_birth:'1990-01-01'};
    card={status:'issued'}; assert.equal((await request(true)).status,403);
    member.status='active'; verification={result:'pending'}; assert.equal((await request(true)).status,403);
    verification={result:'passed'}; card.status='suspended'; assert.equal((await request(true)).status,403);

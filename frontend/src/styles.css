@@ -30,3 +30,28 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .ride-form button { background: #f5b316; color: #111; border: 0; border-radius: 6px; }
 .ride-options { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,260px),1fr)); gap: 16px; }
 .ride-options a { color: #ffe1a1; }
+.bario-app { padding: clamp(16px,3vw,32px); max-width: 1200px; margin: auto; line-height: 1.6; }
+.bario-header { text-align: center; margin: 0 auto 40px; }
+.bario-header img { width: min(100%,280px); height: auto; }
+.bario-header h1 { color: #f5b316; margin-bottom: 8px; font-size: clamp(1.7rem,4vw,2.6rem); }
+.membership-cta { display: inline-block; background: #f5b316; color: #111; padding: 12px 20px; border-radius: 8px; font-weight: bold; }
+.membership-panel { background: #191919; border: 1px solid #59451e; border-radius: 16px; padding: clamp(16px,3vw,32px); margin: 24px auto; }
+.membership-panel h2 { color: #f5b316; margin: 0; }
+.membership-tabs,.membership-account { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 20px 0; }
+.membership-tabs button[aria-pressed=true] { border-color: #f5b316; color: #ffe1a1; }
+button { border: 1px solid #666; border-radius: 6px; }
+.digital-card { display: grid; grid-template-columns: 1fr minmax(240px,320px); gap: 24px; border: 1px solid #c69b44; border-radius: 16px; padding: clamp(16px,3vw,32px); background: linear-gradient(135deg,#302710,#111); }
+.digital-card h3 { font-size: 1.6rem; color: #ffe1a1; margin-top: 0; overflow-wrap: anywhere; }
+.digital-card-qr { text-align: center; }
+.digital-card-qr img { width: min(100%,280px); height: auto; }
+.scan-code { display: block; overflow-wrap: anywhere; user-select: all; font-size: .9rem; }
+.membership-notice { border-left: 3px solid #f5b316; padding: 16px; background: #292213; }
+.activity-list { padding-left: 20px; }
+.activity-list li { padding: 12px 0; border-bottom: 1px solid #444; }
+.scanner-video { display: block; width: min(100%,480px); max-height: 360px; margin: 12px 0; }
+.camera-off { height: 0; margin: 0; }
+.membership-panel select { display: block; padding: 12px; max-width: 100%; }
+summary { cursor: pointer; font-weight: 600; }
+footer { padding: 24px 0; font-size: .85rem; color: #bbb; }
+:focus-visible { outline: 3px solid #f5b316; outline-offset: 3px; }
+@media(max-width:640px) { .digital-card { grid-template-columns: 1fr; } }

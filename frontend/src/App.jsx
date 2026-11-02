@@ -1,78 +1,23 @@
-import RideCompare from './RideCompare.jsx';
+import {useState} from 'react';
 import RewardsRules from './RewardsRules.jsx';
+import RideCompare from './RideCompare.jsx';
+import Membership from './Membership.jsx';
+import StaffScanner from './StaffScanner.jsx';
 
-import {useEffect,useState} from 'react';
 export default function App(){
-  const [memberId,setMemberId]=useState(localStorage.getItem('bario_id')||'');
-  const [points,setPoints]=useState(null);
-  useEffect(() => {
-    if (!memberId) return;
-    let cancelled = false;
-    fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/members/'+encodeURIComponent(memberId))
-      .then(r => { if (!r.ok) throw new Error('Profile unavailable'); return r.json(); })
-      .then(d => { if (!cancelled) setPoints(d.points); })
-      .catch(() => { if (!cancelled) setPoints(null); });
-    return () => { cancelled = true; };
-  }, [memberId]);
-  const [delivery,setDelivery]=useState('pickup');
-  const join = async (e)=>{
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    const dob = fd.get('dob');
-    const age = (Date.now()-new Date(dob).getTime())/(365.25*24*3600*1000);
-    if(age<21){alert('Must be 21+');return;}
-    const mailingAddress = delivery === 'mail' ? {street:fd.get('street'),city:fd.get('city'),state:fd.get('state'),postalCode:fd.get('postalCode')} : null;
-    const res = await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/members/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dob,name:fd.get('name'),email:fd.get('email'),phone:fd.get('phone'),preferredDelivery:delivery,mailingAddress})});
-    const data = await res.json();
-    if(!res.ok){alert(data.error||'Unable to create membership');return;}
-    if(data.memberId){setPoints(data.points); localStorage.setItem('bario_token',data.qrToken); localStorage.setItem('bario_id',data.memberId); setMemberId(data.memberId);}
-  };
-  return (
-    <div style={{background:'#0f0f0f',color:'#fff',minHeight:'100vh',padding:20,fontFamily:'sans-serif'}}>
-      <header style={{textAlign:'center',maxWidth:760,margin:'0 auto 24px'}}>
-        <img
-          src="/bario-logo.png"
-          alt="BARIO gold bell and cocktail logo"
-          style={{display:'block',width:'min(100%, 420px)',height:'auto',margin:'0 auto'}}
-        />
-        <h1 style={{color:'#f5b316',marginTop:12}}>BARIO Voluntary 21+ Membership</h1>
-      </header>
-      <p>Voluntary membership. No alcohol purchase required. Alcohol and gaming points are disabled.</p>
-      {!memberId ? (
-        <form onSubmit={join} style={{display:'grid',gap:8,maxWidth:400}}>
-          <input name="name" placeholder="Name" required style={{padding:8}}/>
-          <input name="email" type="email" placeholder="Email" required style={{padding:8}}/>
-          <input name="phone" type="tel" placeholder="Phone (optional)" style={{padding:8}}/>
-          <input name="dob" type="date" required style={{padding:8}}/>
-          <label>Physical card delivery
-            <select value={delivery} onChange={e=>setDelivery(e.target.value)} style={{display:'block',padding:8,marginTop:4}}>
-              <option value="pickup">Pick up at a participating bar</option>
-              <option value="mail">Mail from BARIO</option>
-            </select>
-          </label>
-          {delivery === 'mail' && <div style={{display:'grid',gap:8}}>
-            <input name="street" placeholder="Street address" required style={{padding:8}}/>
-            <input name="city" placeholder="City" required style={{padding:8}}/>
-            <input name="state" placeholder="State" required maxLength="2" style={{padding:8}}/>
-            <input name="postalCode" placeholder="ZIP code" required style={{padding:8}}/>
-          </div>}
-          <label><input type="checkbox" required/> I am 21+ and understand membership is voluntary, not required to purchase alcohol. CCPA Notice acknowledged.</label>
-          <button style={{background:'#f5b316',color:'#000',padding:10}}>Join Free - Get BARIO ID</button>
-        </form>
-      ):(
-        <div>
-          <p>Member: {memberId} | Points: {points ?? 'Unavailable'}</p>
-          <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
-            <button disabled title="Gaming rewards require license review and are not available yet">Gaming rewards — coming later</button>
-            <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/merch/discount',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(localStorage.getItem('bario_token')||'')},body:JSON.stringify({memberId})}); alert(JSON.stringify(await r.json()))}}>Get 20% Merch Code</button>
-            <button onClick={async()=>{const r=await fetch((import.meta.env.VITE_API_URL||'http://localhost:3001')+'/api/v1/merch/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({memberId,email:'test@bario.com',items:[{name:'BARIO Tee',price:35}]})}); const d=await r.json(); window.open(d.url,'_blank')}}>Buy Tee via Stripe</button>
-          </div>
-        </div>
-      )}
-      <RideCompare memberId={memberId} />
-      <RewardsRules />
-      <hr style={{margin:'20px 0'}}/>
-      <p style={{fontSize:12,opacity:0.6}}>Voluntary program. 21+ Drink responsibly. Alcohol and gaming rewards are unavailable pending future license review and approval.</p>
-    </div>
-  )
+  const [member,setMember]=useState(null);
+  const [signedIn,setSignedIn]=useState(false);
+  return <main className="bario-app">
+    <header className="bario-header">
+      <img src="/bario-logo.png" alt="BARIO gold bell and cocktail logo" />
+      <h1>BARIO — Bar is Open</h1>
+      <p>Your night out. Your membership. Free to start.</p>
+      <a className="membership-cta" href="#membership">Get your free digital card</a>
+    </header>
+    <Membership onMemberChange={setMember} onSessionChange={setSignedIn} />
+    <StaffScanner signedIn={signedIn} />
+    <RideCompare memberId={member?.member_number || ''} />
+    <RewardsRules />
+    <footer>Voluntary 21+ program. No alcohol purchase required. Alcohol and gaming points are disabled. Ride discounts require confirmed offers; free membership does not guarantee a ride discount.</footer>
+  </main>;
 }
