@@ -1,0 +1,18 @@
+{
+  "environment": "sandbox",
+  "livemode": false,
+  "stripeAccount": "acct_1UXT9d83JYIBBV20",
+  "productId": "prod_VYaRRLLObNecnL",
+  "priceId": "price_1UXTGp83JYIBBV20jxTuRG4w",
+  "monthlyAmountCents": 7500,
+  "currency": "usd",
+  "trialDays": 30,
+  "paymentLinkId": "plink_1UXTHJ83JYIBBV20L5Fuj4Ru",
+  "paymentLinkUrl": "https://buy.stripe.com/test_fZubIV0aH7uVfc9aoi93y00",
+  "customerPortalConfigurationId": "bpc_1UXTHr83JYIBBV20x2CVk6rv",
+  "customerPortalUrl": "https://billing.stripe.com/p/login/test_fZubIV0aH7uVfc9aoi93y00",
+  "customersFree": true,
+  "applicationBillingEnabled": false,
+  "webhookIntegrationComplete": false,
+  "automaticTaxEnabled": false
+}
