@@ -5,7 +5,9 @@ export const auth=createClient(
   import.meta.env.VITE_SUPABASE_URL || 'https://goybkvgbbomkkrsnouyx.supabase.co',
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_pz0iwBx1NYQMec4te5Tbdw_bKisH14P'
 );
-export const API_BASE=import.meta.env.VITE_API_URL || 'https://goybkvgbbomkkrsnouyx.supabase.co/functions/v1/bario-membership';
+export const API_BASE=import.meta.env.VITE_API_URL || (import.meta.env.PROD
+  ? ''
+  : 'https://goybkvgbbomkkrsnouyx.supabase.co/functions/v1/bario-membership');
 export async function apiFetch(path,options={}) {
   const {data:{session}}=await auth.auth.getSession();
   if(!session) throw new Error('Sign in to continue.');
