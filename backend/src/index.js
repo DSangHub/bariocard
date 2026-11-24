@@ -26,4 +26,8 @@ app.use((error, req, res, next) => {
   res.status(500).json({error:'Internal server error'});
 });
 
-app.listen(process.env.PORT || 3001, ()=> console.log('BARIO API running'));
+export default app;
+
+if (!process.env.VERCEL) {
+  app.listen(process.env.PORT || 3001, ()=> console.log('BARIO API running'));
+}
