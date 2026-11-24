@@ -14,6 +14,12 @@ Phone wallet passes, reward redemption, self-service bar onboarding, billing and
 
 The production membership API is the `bario-membership` Supabase Edge Function in the existing BARIO project. The frontend defaults to this endpoint; its project URL and publishable key are public configuration. No server secrets are placed in Vite variables.
 
+### Vercel Services deployment
+
+The root `vercel.json` deploys `frontend` and `backend` together as one Vercel Services project. Public `/api/*` traffic is routed to the Express backend and all other paths are routed to the Vite frontend. The frontend uses the relative `/api` path in production, so preview and production deployments call their matching backend service without hard-coded deployment URLs.
+
+Set `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, and `FRONTEND_URL` as server environment variables during import. `SUPABASE_SECRET_KEY` must never use a `VITE_` prefix. `FRONTEND_URL` should be the production site origin after the domain is attached; same-origin preview requests do not require a separate preview URL. Vercel Services is currently Beta.
+
 Frontend: set project root to `frontend`, run `npm ci` and `npm run build`, publish `dist`. Keep Supabase Auth Site URL and allowed redirect URLs set to the actual HTTPS frontend origin (including https://bariocard.com/ and https://www.bariocard.com/ if used). Confirmation and password recovery email delivery require working Supabase mail configuration. No production frontend hosting project was identified during this change.
 
 Local frontend: `npm ci --prefix frontend` then `npm run dev --prefix frontend`. It uses the deployed Edge Function by default. Add localhost to Auth redirects for local confirmation/recovery tests.
