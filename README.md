@@ -2,6 +2,8 @@
 
 Customers join free at launch. No card, subscription, automatic upgrade, or payment collection is part of customer enrollment. Bars have a separate proposed 30-day-free / $75 monthly plan; bar billing is not enabled here.
 
+Bar owners can sign in and submit a business profile with owner/manager name, address, phone, ABC license number, and licensing jurisdiction. New and license-changed applications remain pending until BARIO verifies the license with the applicable ABC authority. Submission does not represent automatic government verification or approval, and bar benefits remain disabled while pending.
+
 ## Customer flow
 
 Create an email/password account, confirm email, sign in, then complete name/date of birth and optional phone. Enrollment creates a free membership, digital card, pending age check, and welcome activity in one transaction. Existing memberships can be linked only to a confirmed account with the matching email. Membership status and points come from the server. The signup form includes password visibility, confirmation resend, password reset and recovery, and sign-out.
@@ -33,6 +35,8 @@ All membership/staff/rideshare endpoints require a confirmed Supabase Auth sessi
 - POST /api/v1/members/enroll
 - GET /api/v1/members/me
 - POST /api/v1/members/me/card
+- GET /api/v1/owners/me
+- POST /api/v1/owners/apply
 - GET /api/v1/staff/bars
 - POST /api/v1/staff/scan
 - POST /api/v1/partners/rideshare/compare
