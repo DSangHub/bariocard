@@ -34,6 +34,7 @@ export function createMembershipHandler(db,qrImage) {
         if(error)throw error;return data;
       }
       function publicMember(m){const {date_of_birth,...safe}=m;return safe;}
+      const clean=(value,min,max)=>typeof value==='string'&&value.trim().length>=min&&value.trim().length<=max?value.trim():null;
       if(path==='members/enroll'&&request.method==='POST'){
         const {name,dob,phone='',consent}=body;
         if(typeof name!=='string'||name.trim().length<2||name.trim().length>120||typeof phone!=='string'||phone.length>40||consent!==true)
@@ -57,6 +58,24 @@ export function createMembershipHandler(db,qrImage) {
         if(error)fail(403,'Your digital card is unavailable. Check membership status or contact support.');
         const qrText='bario:check:'+code;
         return reply({...data,qrText,qrImage:await qrImage(qrText)});
+      }
+      if(path==='owners/me'&&request.method==='GET'){
+        const {data,error}=await db.from('partner_bars').select('id,name,owner_name,phone,address,abc_license_number,abc_jurisdiction,abc_verification_status,status,created_at,updated_at').eq('owner_user_id',user.id).maybeSingle();
+        if(error)throw error;if(!data)fail(404,'Complete your bar owner profile.');
+        return reply({bar:data});
+      }
+      if(path==='owners/apply'&&request.method==='POST'){
+        const barName=clean(body.barName,2,160),ownerName=clean(body.ownerName,2,120),phone=clean(body.phone,7,40);
+        const line1=clean(body.addressLine1,3,160),line2=body.addressLine2===''?'':clean(body.addressLine2,2,160);
+        const city=clean(body.city,2,100),region=clean(body.state,2,60),postalCode=clean(body.postalCode,3,20);
+        const license=clean(body.abcLicenseNumber,2,80),jurisdiction=clean(body.abcJurisdiction,2,80);
+        if(!barName||!ownerName||!phone||!line1||line2===null||!city||!region||!postalCode||!license||!jurisdiction||body.consent!==true)
+          fail(400,'Enter the bar owner, address, phone, and ABC license information, then confirm authorization.');
+        const {data,error}=await db.rpc('apply_bario_partner_bar',{actor_id:user.id,payload:{bar_name:barName,owner_name:ownerName,phone,
+          address:{line1,line2,city,state:region,postal_code:postalCode,country:'US'},abc_license_number:license,abc_jurisdiction:jurisdiction}});
+        if(error?.code==='23505')fail(409,'That ABC license or owner profile is already registered. Contact BARIO for help.');
+        if(error)throw error;
+        return reply({bar:data,message:'Application received. BARIO approval remains pending until the ABC license is verified.'},201);
       }
       if(path==='staff/bars'&&request.method==='GET'){
         const {data,error}=await db.from('bar_staff').select('bar_id,partner_bars(id,name,status)').eq('auth_user_id',user.id).eq('active',true);

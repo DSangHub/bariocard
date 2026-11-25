@@ -46,6 +46,8 @@ button { border: 1px solid #666; border-radius: 6px; }
 .digital-card-qr img { width: min(100%,280px); height: auto; }
 .scan-code { display: block; overflow-wrap: anywhere; user-select: all; font-size: .9rem; }
 .membership-notice { border-left: 3px solid #f5b316; padding: 16px; background: #292213; }
+.bar-owner-summary { border: 1px solid #66552f; border-radius: 10px; padding: 18px; background: #211d14; }
+.bar-owner-summary h3 { color: #ffe1a1; margin-top: 0; }
 .activity-list { padding-left: 20px; }
 .activity-list li { padding: 12px 0; border-bottom: 1px solid #444; }
 .scanner-video { display: block; width: min(100%,480px); max-height: 360px; margin: 12px 0; }

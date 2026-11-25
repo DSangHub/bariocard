@@ -42,6 +42,13 @@ test('card QR contains only random temporary credential and stores only its hash
  const rpc=calls.find(call=>call.name==='issue_bario_qr');assert.equal(rpc.args.actor_id,'verified-user');assert.match(rpc.args.new_hash,/^[a-f0-9]{64}$/);
  assert.equal(response.headers.get('cache-control'),'no-store');
 });
+test('bar owner application is session-scoped and starts ABC verification without trusting status',async()=>{
+ const {handle,calls}=fixture();const valid={barName:'Example Bar',ownerName:'Owner Name',phone:'555-555-1212',addressLine1:'1 Main St',addressLine2:'',city:'Sacramento',state:'CA',postalCode:'95814',abcLicenseNumber:'ABC-12345',abcJurisdiction:'California ABC',consent:true};
+ assert.equal((await request(handle,'owners/apply',{...valid,consent:false})).status,400);
+ const response=await request(handle,'owners/apply',{...valid,actor_id:'attacker',status:'approved',abc_verification_status:'verified'});
+ assert.equal(response.status,201);const rpc=calls.find(call=>call.name==='apply_bario_partner_bar');
+ assert.equal(rpc.args.actor_id,'verified-user');assert.equal(rpc.args.payload.status,undefined);assert.equal(rpc.args.payload.abc_verification_status,undefined);
+});
 test('staff scan uses session actor, hashes QR and rejects malformed input',async()=>{
  const {handle,calls}=fixture();assert.equal((await request(handle,'staff/scan',{barId:'x',qrText:'x'})).status,400);
  const response=await request(handle,'staff/scan',{actor_id:'attacker',barId:'12345678-1234-1234-1234-123456789012',qrText:'bario:check:'+'a'.repeat(43),idChecked:true});
