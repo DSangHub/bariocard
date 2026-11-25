@@ -4,6 +4,7 @@ import RewardsRules from './RewardsRules.jsx';
 import RideCompare from './RideCompare.jsx';
 import Membership from './Membership.jsx';
 import StaffScanner from './StaffScanner.jsx';
+import BarOwnerProfile from './BarOwnerProfile.jsx';
 export default function App() {
   const {t} = useLanguage();
   const [member, setMember] = useState(null);
@@ -17,6 +18,7 @@ export default function App() {
       <a className="membership-cta" href="#membership">{t("Get your free digital card")}</a>
     </header>
     <Membership onMemberChange={setMember} onSessionChange={setSignedIn} />
+    <BarOwnerProfile signedIn={signedIn} />
     <StaffScanner signedIn={signedIn} />
     <RideCompare memberId={member?.member_number || ''} />
     <RewardsRules />
